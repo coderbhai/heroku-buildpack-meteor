@@ -107,53 +107,11 @@ fi
 # Run subsequent commands from the build directory
 cd $build_dir
 
-####### Build the project's dependencies
-
-head "Building dependencies"
-
-# Did we bust the cache?
-if ! $modules_cached; then
-  use_cache=false
-elif ! $NODE_MODULES_CACHE; then
-  info "Cache disabled with NODE_MODULES_CACHE"
-  use_cache=false
-elif [ "$node_previous" != "" ] && [ "$node_engine" != "$node_previous" ]; then
-  info "Node version changed ($node_previous => $node_engine); invalidating cache"
-  use_cache=false
-elif [ "$npm_previous" != "" ] && [ "$npm_engine" != "$npm_previous" ]; then
-  info "Npm version changed ($npm_previous => $npm_engine); invalidating cache"
-  use_cache=false
-else
-  use_cache=true
-fi
-
-if [ "$modules_source" == "" ]; then
-  info "Skipping dependencies (no source for node_modules)"
-
-elif [ $modules_source == "prebuilt" ]; then
-  info "Rebuilding any native modules for this architecture"
-  npm rebuild 2>&1 | indent
-  info "Installing any new modules"
-  npm install --quiet --userconfig $build_dir/.npmrc 2>&1 | indent
-
-elif $use_cache; then
-  info "Restoring node modules from cache"
-  cp -r $cache_dir/node/node_modules $build_dir/
-  info "Pruning unused dependencies"
-  npm prune 2>&1 | indent
-  info "Installing any new modules"
-  npm install --quiet --userconfig $build_dir/.npmrc 2>&1 | indent
-
-else
-  info "Installing node modules"
-  touch $build_dir/.npmrc
-  npm install --quiet --userconfig $build_dir/.npmrc 2>&1 | indent
-fi
 
 ####### Extract bundle
 tar xzf $1/build/output.tar.gz -C $build_dir/build
 echo "Listing build files"
-ls $build_dir/build
+ls $build_dir/build/bundle
 
 ####### Create a Procfile if possible
 
@@ -180,10 +138,6 @@ echo "export NODE_HOME=\"$build_dir/.heroku/node\"" >> $bp_dir/export
 ####### Clean up
 
 info "Cleaning up build artifacts"
-
-# Clean up after npm
-rm -rf "$build_dir/.node-gyp"
-rm -rf "$build_dir/.npm"
 
 # Clear the cache
 rm -rf $cache_dir/node_modules # (for apps still on the older caching strategy)
