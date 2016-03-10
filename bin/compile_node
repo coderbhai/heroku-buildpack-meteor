@@ -152,7 +152,8 @@ fi
 
 ####### Extract bundle
 tar xzf $1/build/output.tar.gz -C $build_dir/build
-
+echo "Listing build files"
+ls $build_dir/build
 
 ####### Create a Procfile if possible
 
