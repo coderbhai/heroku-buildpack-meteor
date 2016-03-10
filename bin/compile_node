@@ -159,7 +159,7 @@ tar xzf $1/build/output.tar.gz -C $build_dir/build
 head "Checking startup method"
 
 info "No Procfile; Adding 'web: node main.js' to new Procfile"
-echo "web: node main.js" > $build_dir/Procfile
+echo "web: node $build_dir/build/main.js" > $build_dir/Procfile
 
 
 ####### Create the runtime environment (profile.d)
