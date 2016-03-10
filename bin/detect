@@ -1,8 +1,8 @@
 #!/bin/sh
 # USAGE bin/detect BUILD_DIR
 
-if [ -d $1/.meteor ]; then
-  echo "meteor"
+if [ -d $1/build/output.tar.gz ]; then
+  echo "meteor-bundle"
   exit 0
 else
   exit 1
